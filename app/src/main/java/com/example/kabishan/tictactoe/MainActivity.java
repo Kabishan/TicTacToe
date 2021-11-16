@@ -1,5 +1,6 @@
 package com.example.kabishan.tictactoe;
 
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+    MediaPlayer clearPlayer;
+    MediaPlayer dropInPlayer;
+    MediaPlayer winPlayer;
+
     int activePlayer = 0; // 0 red, 1 yellow
     boolean gameDone = false;
 
@@ -24,9 +29,11 @@ public class MainActivity extends AppCompatActivity {
 
     protected void dropIn(View view) {
         ImageView counter = (ImageView) view;
-        TextView winnerTextView = (TextView) findViewById(R.id.winnerTextView);
-        Button playAgainButton = (Button) findViewById(R.id.playAgainButton);
+        TextView winnerTextView = findViewById(R.id.winnerTextView);
+        Button playAgainButton = findViewById(R.id.playAgainButton);
         int tappedCounter = Integer.parseInt(counter.getTag().toString());
+
+        dropInPlayer.start();
 
         if (gameState[tappedCounter] == 2 && !gameDone) {
             counter.setTranslationY(-1500);
@@ -43,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
             counter.animate().translationYBy(1500).rotation(360).setDuration(500);
 
             if (playerWon()) {
+                winPlayer.start();
+
                 winnerTextView.setText((activePlayer == 1 ? "Red" : "Yellow") + " has won");
                 winnerTextView.setVisibility(View.VISIBLE);
                 playAgainButton.setVisibility(View.VISIBLE);
@@ -86,10 +95,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void playAgain(View view) {
-        TextView winnerTextView = (TextView) findViewById(R.id.winnerTextView);
-        Button playAgainButton = (Button) findViewById(R.id.playAgainButton);
+        TextView winnerTextView = findViewById(R.id.winnerTextView);
+        Button playAgainButton = findViewById(R.id.playAgainButton);
         GridLayout grid = findViewById(R.id.board);
 
+        clearPlayer.start();
         winnerTextView.setVisibility(View.INVISIBLE);
         playAgainButton.setVisibility(View.INVISIBLE);
         gameDone = false;
@@ -107,5 +117,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dropInPlayer = MediaPlayer.create(this, R.raw.pop);
+        clearPlayer = MediaPlayer.create(this, R.raw.clear);
+        winPlayer = MediaPlayer.create(this, R.raw.applause);
     }
 }
