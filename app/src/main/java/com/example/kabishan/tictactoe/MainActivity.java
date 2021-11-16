@@ -1,5 +1,6 @@
 package com.example.kabishan.tictactoe;
 
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,12 +8,14 @@ import android.view.View;
 import android.widget.Button;
 import android.support.v7.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     MediaPlayer clearPlayer;
     MediaPlayer dropInPlayer;
     MediaPlayer winPlayer;
+    AudioManager audioManager;
 
     int activePlayer = 0; // 0 red, 1 yellow
     boolean gameDone = false;
@@ -26,6 +29,38 @@ public class MainActivity extends AppCompatActivity {
                                 {2, 5, 8},
                                 {0, 4, 8},
                                 {2, 4, 6}};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        dropInPlayer = MediaPlayer.create(this, R.raw.pop);
+        clearPlayer = MediaPlayer.create(this, R.raw.clear);
+        winPlayer = MediaPlayer.create(this, R.raw.applause);
+
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
+        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+        final SeekBar volumeControl = findViewById(R.id.seekBar);
+        volumeControl.setProgress(currentVolume);
+        volumeControl.setMax(maxVolume);
+
+        volumeControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+    }
 
     protected void dropIn(View view) {
         ImageView counter = (ImageView) view;
@@ -111,15 +146,5 @@ public class MainActivity extends AppCompatActivity {
 
             gameState[i] = 2;
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        dropInPlayer = MediaPlayer.create(this, R.raw.pop);
-        clearPlayer = MediaPlayer.create(this, R.raw.clear);
-        winPlayer = MediaPlayer.create(this, R.raw.applause);
     }
 }
